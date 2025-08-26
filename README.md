@@ -1,8 +1,8 @@
-Voice Assistant App
+#Voice Assistant App
 
 
- **Project Overview:
-**
+ ##Project Overview:
+
 Voice Assistant App is a web-based personal assistant built using Flask, designed to help users perform everyday tasks efficiently through text-based commands.
 
 This application allows users to:
