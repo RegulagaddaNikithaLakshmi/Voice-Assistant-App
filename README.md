@@ -1,7 +1,7 @@
-#Voice Assistant App
+Voice Assistant App
 
 
- ##Project Overview:
+💡 Project Overview
 
 Voice Assistant App is a web-based personal assistant built using Flask, designed to help users perform everyday tasks efficiently through text-based commands.
 
@@ -20,7 +20,7 @@ Interact via a simple and intuitive interface
 The app is optimized for cloud deployment on platforms like Render, Heroku, or AWS, making it accessible to anyone with an internet connection.
 It combines Python backend logic with HTML, CSS, and optional JavaScript frontend, providing a smooth, responsive, and user-friendly experience.
 
-✨ Features:
+✨ Features
 
 🌦️ Real-time Weather updates
 
@@ -94,4 +94,6 @@ http://127.0.0.1:5000
 📄 License:
 
 This project is licensed under the MIT License.
+
+
 
