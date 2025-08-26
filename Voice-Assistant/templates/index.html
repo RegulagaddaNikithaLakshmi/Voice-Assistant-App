@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice Assistant</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: white;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+            padding: 20px;
+            margin: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .assistant-panel {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .voice-controls {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .mic-button {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #ff6b6b, #ee5a52);
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: white;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
+        }
+
+        .mic-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(255, 107, 107, 0.6);
+        }
+
+        .mic-button:active {
+            transform: scale(0.95);
+        }
+
+        .mic-button.listening {
+            animation: pulse 1.5s infinite;
+            background: linear-gradient(45deg, #4ecdc4, #44a08d);
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .status {
+            text-align: center;
+            margin: 15px 0;
+            font-size: 1.1rem;
+            min-height: 25px;
+            opacity: 0.9;
+        }
+
+        .command-display {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 15px;
+            margin: 15px 0;
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-style: italic;
+            opacity: 0.8;
+        }
+
+        .response-display {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 15px 0;
+            min-height: 80px;
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+
+        .control-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 25px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+
+        .btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .text-input-section {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .text-input {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 25px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            font-size: 1rem;
+            backdrop-filter: blur(5px);
+        }
+
+        .text-input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .commands-help {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 25px;
+            margin-top: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .help-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .help-item {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+        }
+
+        .help-item h4 {
+            color: #ffd700;
+            margin-bottom: 8px;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 600px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .mic-button {
+                width: 100px;
+                height: 100px;
+                font-size: 2.5rem;
+            }
+            
+            .control-buttons {
+                flex-wrap: wrap;
+            }
+            
+            .text-input-section {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎤 Voice Assistant</h1>
+            <p>AI Personal Assistant</p>
+        </div>
+
+        <div class="assistant-panel">
+            <div class="voice-controls">
+                <button class="mic-button" id="micButton" title="Click to start listening">
+                    🎤
+                </button>
+                
+                <div class="status" id="status">Click the microphone to start</div>
+                
+                <div class="command-display" id="commandDisplay">
+                    Your command will appear here...
+                </div>
+                
+                <div class="response-display" id="responseDisplay">
+                    Assistant response will appear here...
+                </div>
+
+                <div class="control-buttons">
+                    <button class="btn" onclick="clearDisplays()">Clear</button>
+                    <button class="btn" onclick="testSpeech()">Test Speech</button>
+                    <button class="btn" onclick="toggleHelp()">Help</button>
+                </div>
+
+                <div class="text-input-section">
+                    <input type="text" class="text-input" id="textInput" 
+                           placeholder="Or type your command here..." onkeypress="handleKeyPress(event)">
+                    <button class="btn" onclick="processTextCommand()">Send</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="commands-help" id="helpPanel" style="display: none;">
+            <h3>🤖 Available Commands</h3>
+            <div class="help-grid">
+                <div class="help-item">
+                    <h4>Weather</h4>
+                    <p>"What's the weather?" or "Weather in Delhi"</p>
+                </div>
+                <div class="help-item">
+                    <h4>News</h4>
+                    <p>"Get me the news" or "Latest news"</p>
+                </div>
+                <div class="help-item">
+                    <h4>Time & Date</h4>
+                    <p>"What time is it?" or "What's the date?" or "What's today?"</p>
+                </div>
+                <div class="help-item">
+                    <h4>YouTube</h4>
+                    <p>"Open YouTube" or "Search YouTube for funny videos"</p>
+                </div>
+                <div class="help-item">
+                    <h4>Google Search</h4>
+                    <p>"Google search Python tutorials" or "Open Google"</p>
+                </div>
+                <div class="help-item">
+                    <h4>Websites</h4>
+                    <p>"Open Facebook" or "Open Gmail" or "Open Amazon"</p>
+                </div>
+                <div class="help-item">
+                    <h4>Social Media</h4>
+                    <p>"Open Instagram" or "Open Twitter" or "Open LinkedIn"</p>
+                </div>
+                <div class="help-item">
+                    <h4>Popular Sites</h4>
+                    <p>"Open Netflix" or "Open GitHub" or "Open Wikipedia"</p>
+                </div>
+                <div class="help-item">
+                    <h4>Greetings</h4>
+                    <p>"Hello" or "Hi there" or "Hey assistant"</p>
+                </div>
+                <div class="help-item">
+                    <h4>Help</h4>
+                    <p>"What can you do?" or "Help me"</p>
+                </div>
+                <div class="help-item">
+                    <h4>Exit</h4>
+                    <p>"Stop" or "Exit" or "Goodbye"</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let isListening = false;
+        const micButton = document.getElementById('micButton');
+        const status = document.getElementById('status');
+        const commandDisplay = document.getElementById('commandDisplay');
+        const responseDisplay = document.getElementById('responseDisplay');
+        const textInput = document.getElementById('textInput');
+
+        // Initialize
+        loadReminders();
+
+        micButton.addEventListener('click', function() {
+            if (!isListening) {
+                startListening();
+            }
+        });
+
+        function startListening() {
+            if (isListening) return;
+            
+            isListening = true;
+            micButton.classList.add('listening');
+            micButton.innerHTML = '🎙️';
+            status.innerHTML = 'Listening... <span class="loading"></span>';
+            commandDisplay.textContent = 'Listening for your command...';
+
+            fetch('/listen', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                isListening = false;
+                micButton.classList.remove('listening');
+                micButton.innerHTML = '🎤';
+
+                if (data.success) {
+                    commandDisplay.textContent = `"${data.command}"`;
+                    status.textContent = 'Processing command...';
+                    processCommand(data.command);
+                } else {
+                    status.textContent = data.message;
+                    setTimeout(() => {
+                        status.textContent = 'Click the microphone to start';
+                    }, 3000);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                isListening = false;
+                micButton.classList.remove('listening');
+                micButton.innerHTML = '🎤';
+                status.textContent = 'Error occurred. Please try again.';
+                setTimeout(() => {
+                    status.textContent = 'Click the microphone to start';
+                }, 3000);
+            });
+        }
+
+        function processCommand(command) {
+            fetch('/process', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ command: command })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    responseDisplay.textContent = data.response;
+                    status.textContent = 'Response ready';
+                    
+                    // Refresh reminders if it was a reminder command
+                    if (command.includes('reminder')) {
+                        setTimeout(loadReminders, 1000);
+                    }
+                } else {
+                    responseDisplay.textContent = data.message;
+                    status.textContent = 'Error processing command';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                responseDisplay.textContent = 'Error processing command. Please try again.';
+                status.textContent = 'Error occurred';
+            });
+        }
+
+        function processTextCommand() {
+            const command = textInput.value.trim();
+            if (!command) return;
+
+            commandDisplay.textContent = `"${command}"`;
+            status.textContent = 'Processing command...';
+            textInput.value = '';
+            
+            processCommand(command);
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                processTextCommand();
+            }
+        }
+
+        function clearDisplays() {
+            commandDisplay.textContent = 'Your command will appear here...';
+            responseDisplay.textContent = 'Assistant response will appear here...';
+            status.textContent = 'Displays cleared';
+            setTimeout(() => {
+                status.textContent = 'Click the microphone to start';
+            }, 2000);
+        }
+
+        function testSpeech() {
+            status.textContent = 'Testing speech...';
+            fetch('/speak', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ text: 'Hello! This is your voice assistant. Speech is working correctly.' })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    status.textContent = 'Speech test completed';
+                } else {
+                    status.textContent = 'Speech test failed';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                status.textContent = 'Speech test error';
+            });
+        }
+
+        function addQuickReminder() {
+            const reminderText = prompt("Enter reminder text:");
+            if (reminderText && reminderText.trim()) {
+                fetch('/reminders', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ text: reminderText.trim() })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        responseDisplay.textContent = data.response;
+                        status.textContent = 'Reminder added successfully!';
+                        setTimeout(loadReminders, 500);
+                    } else {
+                        responseDisplay.textContent = data.message;
+                        status.textContent = 'Error adding reminder';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    responseDisplay.textContent = 'Error adding reminder';
+                    status.textContent = 'Network error';
+                });
+            }
+        }
+
+        function loadReminders() {
+            console.log('Loading reminders...');
+            const remindersList = document.getElementById('remindersList');
+            const reminderCount = document.getElementById('reminderCount');
+            
+            // Show loading state
+            remindersList.innerHTML = '<div class="reminder-item" style="text-align: center; color: #ccc;">Loading...</div>';
+            
+            fetch('/reminders')
+            .then(response => {
+                console.log('Response status:', response.status);
+                return response.json();
+            })
+            .then(data => {
+                console.log('Reminders data received:', data);
+                
+                if (data.reminders && data.reminders.length > 0) {
+                    reminderCount.textContent = data.reminders.length;
+                    remindersList.innerHTML = '';
+                    
+                    data.reminders.forEach((reminder, index) => {
+                        const reminderDiv = document.createElement('div');
+                        reminderDiv.className = 'reminder-item';
+                        reminderDiv.innerHTML = `
+                            <strong>📌 ${reminder.text}</strong>
+                            <br><small style="color: #ccc;">Created: ${reminder.created_at}</small>
+                        `;
+                        remindersList.appendChild(reminderDiv);
+                    });
+                    
+                    console.log(`Displayed ${data.reminders.length} reminders`);
+                } else {
+                    reminderCount.textContent = '0';
+                    remindersList.innerHTML = `
+                        <div class="reminder-item" style="text-align: center; color: #ccc;">
+                            No reminders yet<br>
+                            <small>Try: "Set reminder to buy groceries"<br>
+                            Or use the "Quick Reminder" button</small>
+                        </div>`;
+                }
+            })
+            .catch(error => {
+                console.error('Error loading reminders:', error);
+                reminderCount.textContent = '?';
+                remindersList.innerHTML = `
+                    <div class="reminder-item" style="color: #ff6b6b; text-align: center;">
+                        Error loading reminders<br>
+                        <small>${error.message}</small><br>
+                        <button class="btn" onclick="loadReminders()" style="margin-top: 10px;">Retry</button>
+                    </div>`;
+            });
+        }
+
+        function clearReminders() {
+            fetch('/reminders', { method: 'DELETE' })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    loadReminders();
+                    status.textContent = 'Reminders cleared';
+                    setTimeout(() => {
+                        status.textContent = 'Click the microphone to start';
+                    }, 2000);
+                }
+            })
+            .catch(error => {
+                console.error('Error clearing reminders:', error);
+            });
+        }
+
+        function toggleHelp() {
+            const helpPanel = document.getElementById('helpPanel');
+            if (helpPanel.style.display === 'none') {
+                helpPanel.style.display = 'block';
+            } else {
+                helpPanel.style.display = 'none';
+            }
+        }
+
+        // Auto-refresh reminders every 30 seconds
+        setInterval(loadReminders, 30000);
+    </script>
+</body>
+</html>
