@@ -7,15 +7,15 @@ Voice Assistant App is a web-based personal assistant built using Flask, designe
 
 This application allows users to:
 
-Retrieve real-time weather updates
+.Retrieve real-time weather updates
 
-Access the latest news headlines
+.Access the latest news headlines
 
-Set and manage reminders
+.Set and manage reminders
 
-Instantly open websites
+.Instantly open websites
 
-Interact via a simple and intuitive interface
+.Interact via a simple and intuitive interface
 
 The app is optimized for cloud deployment on platforms like Render, Heroku, or AWS, making it accessible to anyone with an internet connection.
 It combines Python backend logic with HTML, CSS, and optional JavaScript frontend, providing a smooth, responsive, and user-friendly experience.
@@ -83,7 +83,7 @@ Open in browser:
 
 http://127.0.0.1:5000
 
-🎯 Usage:
+**🎯 Usage:**
 
 📝 Enter your command (e.g., "weather", "news", "open Google")
 
@@ -91,7 +91,7 @@ http://127.0.0.1:5000
 
 🌟 The assistant will respond instantly with results
 
-📄 License:
+**📄 License:**
 
 This project is licensed under the MIT License.
 
